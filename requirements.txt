@@ -4,3 +4,4 @@ supabase
 requests
 beautifulsoup4
 python-dotenv
+jinja2
