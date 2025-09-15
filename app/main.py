@@ -5,7 +5,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 
-app = FastAPI(title="DAJOMA_News_API")
+app = FastAPI(
+    title="DAJOMA_News_API", 
+    docs_url=None,        
+    redoc_url=None,
+)
 
 # incluir rutas
 app.include_router(news.router, prefix="/api", tags=["news"])
