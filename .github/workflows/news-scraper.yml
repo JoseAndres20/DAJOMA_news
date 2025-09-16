@@ -1,0 +1,14 @@
+name: Run Scraper Every 3 Days
+
+on:
+  schedule:
+    - cron: "0 3 */3 * *" # cada 3 días a las 03:00 UTC
+  workflow_dispatch: # para poder lanzarlo manualmente
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call API to scrape news
+        run: curl -X GET "https://tu-app.onrender.com/api/scrape?limit=50"
