@@ -11,4 +11,4 @@ jobs:
 
     steps:
       - name: Call API to scrape news
-        run: curl -X GET "https://tu-app.onrender.com/api/scrape?limit=50"
+        run: curl -X GET "https://dajoma-news.onrender.com/api/scrape?limit=50"
