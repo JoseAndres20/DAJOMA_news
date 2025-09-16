@@ -1,13 +1,15 @@
 from urllib.parse import urljoin
+from bs4 import BeautifulSoup
 from app.db.supabase_client import supabase
 from app.services.sources import NEWS_SOURCES
 from app.services.utils import get_headers, get_proxy, get_session
 from app.services.article_parser import fetch_article_data
-from bs4 import BeautifulSoup
+
 
 def scrape_and_save(limit_per_source: int = 3):
-    """Scrapear fuentes de noticias y guardar en Supabase."""
+    """Scrapear fuentes de noticias y guardar en Supabase sin duplicados."""
     all_results = []
+    seen_urls = set()  #
 
     for source in NEWS_SOURCES:
         try:
@@ -26,13 +28,16 @@ def scrape_and_save(limit_per_source: int = 3):
 
                 # Normalizar URL relativa
                 link = urljoin(source["url"], link)
-                if not link.startswith("http"):
+
+                # Evitar duplicados dentro de la ejecución
+                if link in seen_urls:
                     continue
+                seen_urls.add(link)
 
                 # Extraer contenido (texto + imagen)
                 article_text, image_url = fetch_article_data(link)
 
-                # Guardar en Supabase evitando duplicados
+                #
                 supabase.table("news").upsert(
                     {
                         "title": title,
@@ -41,7 +46,7 @@ def scrape_and_save(limit_per_source: int = 3):
                         "text_content": article_text,
                         "image_url": image_url,
                     },
-                    on_conflict="url"  # clave única
+                    on_conflict="url"  # 
                 ).execute()
 
                 all_results.append({
@@ -56,3 +61,4 @@ def scrape_and_save(limit_per_source: int = 3):
             print(f"❌ Error en {source['name']}: {e}")
 
     return all_results
+

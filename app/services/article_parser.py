@@ -15,7 +15,7 @@ def fetch_article_text(soup: BeautifulSoup, limit_paragraphs: int = 5) -> str:
         return ""
 
 
-def fetch_article_image(soup: BeautifulSoup, base_url: str) -> str:
+def fetch_article_image(soup: BeautifulSoup, base_url: str) -> str | None:
     """Intentar extraer la URL de la imagen principal de un artículo."""
     try:
         # Meta tag Open Graph

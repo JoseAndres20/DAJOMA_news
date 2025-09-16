@@ -10,18 +10,25 @@ USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0",
 ]
 
-PROXIES = [
-    # Puedes meter proxies aquí
-]
+PROXIES = []  # agrega proxies si los necesitas
+
 
 def get_headers():
-    return {"User-Agent": random.choice(USER_AGENTS)}
+    return {
+        "User-Agent": random.choice(USER_AGENTS),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.google.com/",
+        "Connection": "keep-alive",
+    }
+
 
 def get_proxy():
     if not PROXIES:
         return None
     proxy = random.choice(PROXIES)
     return {"http": proxy, "https": proxy}
+
 
 def get_session():
     """Crea sesión requests con retries automáticos."""
