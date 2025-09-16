@@ -1,28 +1,12 @@
-import requests
-from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from app.db.supabase_client import supabase
 from app.services.sources import NEWS_SOURCES
 from app.services.utils import get_headers, get_proxy, get_session
-
-
-def fetch_article_text(url: str) -> str:
-    """Extraer los primeros párrafos de una noticia"""
-    try:
-        session = get_session()
-        r = session.get(url, timeout=10, headers=get_headers(), proxies=get_proxy())
-        r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        paragraphs = soup.find_all("p")
-        content = " ".join(p.get_text(strip=True) for p in paragraphs[:5])
-        return content
-    except Exception as e:
-        print(f"⚠️ Error fetching article text: {e}")
-        return ""
-
+from app.services.article_parser import fetch_article_data
+from bs4 import BeautifulSoup
 
 def scrape_and_save(limit_per_source: int = 3):
-    """Scrapear fuentes de noticias y guardar en Supabase"""
+    """Scrapear fuentes de noticias y guardar en Supabase."""
     all_results = []
 
     for source in NEWS_SOURCES:
@@ -40,25 +24,24 @@ def scrape_and_save(limit_per_source: int = 3):
                 if not link:
                     continue
 
-                # 🔥 Normalizar URL relativa
+                # Normalizar URL relativa
                 link = urljoin(source["url"], link)
-
-                # Ignorar enlaces que no sean http/https
                 if not link.startswith("http"):
                     continue
 
-                # Extraer texto
-                article_text = fetch_article_text(link)
+                # Extraer contenido (texto + imagen)
+                article_text, image_url = fetch_article_data(link)
 
-                # Guardar en Supabase evitando duplicados con `url`
+                # Guardar en Supabase evitando duplicados
                 supabase.table("news").upsert(
                     {
                         "title": title,
                         "url": link,
                         "source": source["name"],
                         "text_content": article_text,
+                        "image_url": image_url,
                     },
-                    on_conflict="url"   # 👈 clave única
+                    on_conflict="url"  # clave única
                 ).execute()
 
                 all_results.append({
@@ -66,6 +49,7 @@ def scrape_and_save(limit_per_source: int = 3):
                     "url": link,
                     "source": source["name"],
                     "text_content": article_text,
+                    "image_url": image_url,
                 })
 
         except Exception as e:
