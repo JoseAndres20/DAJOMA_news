@@ -15,7 +15,7 @@ Scrapea fuentes populares de tecnología, guarda el texto de los artículos en S
 
 
 ---
-
+```
 ## 📂 Estructura del proyecto
 app/
 ├── core/ # Configuración y carga de .env
@@ -23,6 +23,7 @@ app/
 ├── routers/ # Endpoints de FastAPI
 ├── services/ # Scraper, IA, fuentes y utilidades
 └── main.py # Entrada principal de la API
+```
 ---
 
 ## ⚙️ Configuración
